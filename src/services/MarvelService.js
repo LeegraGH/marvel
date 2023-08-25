@@ -24,7 +24,7 @@ class MarvelService {
     }
 
     _transformCharacter = (char) => {
-        let description=char.description?(char.description.length>210?char.description.slice(0,210)+"…":char.description):"The information about this character is not available.";
+        let description=char.description?(char.description.length>180?char.description.slice(0,180)+"…":char.description):"The information about this character is not available.";
 
         return {
             name: char.name,
