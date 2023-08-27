@@ -1,6 +1,7 @@
 import { Component } from 'react';
 
 import MarvelService from '../../services/MarvelService';
+import { setObjFitImg } from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 
@@ -11,11 +12,6 @@ import mjolnir from '../../resources/img/mjolnir.png';
 
 class RandomChar extends Component {
 
-    constructor(props) {
-        super(props);
-        this.updateChar();
-    }
-
     state = {
         char: {},
         loading: true,
@@ -23,6 +19,10 @@ class RandomChar extends Component {
     }
 
     marvelService = new MarvelService();
+
+    componentDidMount(){
+        this.updateChar();
+    }
 
     onCharLoaded = (char) => {
         this.setState({char, loading: false});
@@ -46,7 +46,7 @@ class RandomChar extends Component {
         // Если объект null, он не покажется на странице, без всяких ошибок
         const errorMessage= error ? <ErrorMessage/>:null;
         const spinner = loading ? <Spinner/> : null;
-        const content = !(error || loading) ? <View char={char}/>:null;
+        const content = !(error || loading) ? <View char={char} marvelService={this.marvelService}/>:null;
 
         return (
             <div className="randomchar">
@@ -72,11 +72,12 @@ class RandomChar extends Component {
 }
 
 const View = ({char}) => {
-    const {name, description, thumbnail, homepage, wiki} = char;    
+    const {name, description, thumbnail, homepage, wiki} = char;
+    const imgStyle=setObjFitImg(thumbnail);
 
     return (
         <div className="randomchar__block">
-            <img src={thumbnail} alt="Random character" className="randomchar__img"/>
+            <img src={thumbnail} alt="Random character" className="randomchar__img" style={imgStyle}/>
             <div className="randomchar__info">
                 <p className="randomchar__name">{name}</p>
                 <p className="randomchar__descr">
