@@ -1,14 +1,17 @@
 import { Component } from 'react';
 import MarvelService from '../../services/MarvelService';
+import Spinner from '../spinner/Spinner';
+import ErrorMessage from '../errorMessage/ErrorMessage';
 import { setObjFitImg } from '../../services/MarvelService';
 
 import './charList.scss';
-// import abyss from '../../resources/img/abyss.jpg';
 
 class CharList extends Component {
 
     state={
-        chars: []
+        chars: [],
+        loading: true,
+        error: false
     }
 
     marvelService = new MarvelService();
@@ -18,56 +21,58 @@ class CharList extends Component {
     }
 
     onCharsLoaded=(chars)=>{
-        this.setState({chars});
+        this.setState({chars:chars, loading:false});
     }
 
-    // onCharsLoaded=(newChars)=>{
-    //     this.setState(({chars})=>{
-    //         return {chars: [...chars,...newChars]};
-    //     });
-    // }
+    onError = () => {
+        this.setState({loading: false, error: true});
+    }
 
     updateChars=()=>{
+        this.setState({loading: true, error: false});
         this.marvelService.getAllCharacters()
-        .then(this.onCharsLoaded);
+        .then(this.onCharsLoaded)
+        .catch(this.onError);
+    }
+
+    onCharsList = (chars) => {
+        const charsList=chars.map(char => {
+            const {id, thumbnail, name}=char;
+            const imgStyle = setObjFitImg(thumbnail);
+            return (
+                <li className="char__item" key={id} onClick={()=>this.props.onCharSelect(id)}>
+                    <img src={thumbnail} alt={name} style={imgStyle}/>
+                    <div className="char__name">{name}</div>
+                </li>
+            )
+        })
+    
+        return (
+            <ul className="char__grid">
+                {charsList}
+            </ul>
+        )
     }
 
     render(){
-        const {chars}=this.state;
+        const {chars, loading, error} = this.state;
+        const charList=this.onCharsList(chars);
 
-        const charsList=chars.map(char => {
-            const {id, ...values}=char;
-            return (
-                <CharListItem
-                key={id}
-                {...values}
-                />
-            )
-        });
+        const errorMessage= error ? <ErrorMessage/>:null;
+        const spinner = loading ? <Spinner/> : null;
+        const content=!(loading||error)?(charList):null;
 
         return (
             <div className="char__list">
-                <ul className="char__grid">
-                    {charsList}
-                </ul>
+                {errorMessage}
+                {spinner}
+                {content}
                 <button className="button button__main button__long">
                     <div className="inner">load more</div>
-                    {/* <div className="inner" onClick={this.updateChars}>load more</div> */}
                 </button>
             </div>
         )
     }
-}
-
-const CharListItem = ({thumbnail, name}) => {
-    const imgStyle = setObjFitImg(thumbnail);
-
-    return (
-        <li className="char__item">
-            <img src={thumbnail} alt={name} style={imgStyle}/>
-            <div className="char__name">{name}</div>
-        </li>
-    )
 }
 
 export default CharList;

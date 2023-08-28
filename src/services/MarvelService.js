@@ -1,5 +1,3 @@
-
-
 class MarvelService {
 
     _apiBase = "https://gateway.marvel.com:443/v1/public/";
@@ -32,7 +30,8 @@ class MarvelService {
             description: description,
             thumbnail: char.thumbnail.path+'.'+char.thumbnail.extension,
             homepage: char.urls[0].url,
-            wiki: char.urls[1].url
+            wiki: char.urls[1].url,
+            comics: char.comics.items
         };
     }
 }
