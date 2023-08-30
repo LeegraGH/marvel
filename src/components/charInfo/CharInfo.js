@@ -3,6 +3,7 @@ import MarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import Skeleton from '../skeleton/Skeleton';
 import ErrorMessage from '../errorMessage/ErrorMessage';
+import { setObjFitImg } from '../../services/MarvelService';
 
 import './charInfo.scss';
 
@@ -64,7 +65,9 @@ class CharInfo extends Component {
 
 const View = ({char}) => {
     const {name, description, thumbnail, homepage, wiki, comics}=char;
-    const comicsList=comics.map((comic, i)=>{
+    const styleImg=setObjFitImg(thumbnail);
+
+    const comicsList=comics.slice(0,10).map((comic, i)=>{
         return (
             <li className="char__comics-item" key={i}>
                 {comic.name}
@@ -75,7 +78,7 @@ const View = ({char}) => {
     return (
         <>
             <div className="char__basics">
-                <img src={thumbnail} alt={name}/>
+                <img src={thumbnail} alt={name} style={styleImg}/>
                 <div>
                     <div className="char__info-name">{name}</div>
                     <div className="char__btns">
@@ -93,7 +96,7 @@ const View = ({char}) => {
             </div>
             <div className="char__comics">Comics:</div>
             <ul className="char__comics-list">
-                {comicsList}
+                {comicsList.length > 0 ? comicsList : "No information"}
             </ul>
         </>
     )

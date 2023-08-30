@@ -7,11 +7,13 @@ import { setObjFitImg } from '../../services/MarvelService';
 import './charList.scss';
 
 class CharList extends Component {
-
+    
     state={
         chars: [],
         loading: true,
-        error: false
+        error: false,
+        offset: 0,
+        charEnded: false
     }
 
     marvelService = new MarvelService();
@@ -20,8 +22,18 @@ class CharList extends Component {
         this.updateChars();
     }
 
-    onCharsLoaded=(chars)=>{
-        this.setState({chars:chars, loading:false});
+    onCharsLoaded=({total, newChars})=>{
+        let end=false;
+        const offset=this.state.offset+9;
+        if (offset>=total) end=true;
+        this.setState(({chars})=>{
+            return {
+                chars: [...chars, ...newChars],
+                loading: false,
+                offset: offset,
+                charEnded: end
+            }
+        });
     }
 
     onError = () => {
@@ -30,7 +42,7 @@ class CharList extends Component {
 
     updateChars=()=>{
         this.setState({loading: true, error: false});
-        this.marvelService.getAllCharacters()
+        this.marvelService.getAllCharacters(this.state.offset)
         .then(this.onCharsLoaded)
         .catch(this.onError);
     }
@@ -54,22 +66,29 @@ class CharList extends Component {
         )
     }
 
+    onBtnLoad = (offset) => {
+        return (
+            <button className="button button__main button__long" onClick={()=>this.updateChars(offset)}>
+                <div className="inner">load more</div>
+            </button>
+        )
+    }
+
     render(){
-        const {chars, loading, error} = this.state;
+        const {chars, loading, error, offset, charEnded} = this.state;
         const charList=this.onCharsList(chars);
 
         const errorMessage= error ? <ErrorMessage/>:null;
         const spinner = loading ? <Spinner/> : null;
-        const content=!(loading||error)?(charList):null;
+        const content=!(error||charList.length===0)?(charList):null;
+        const btnLoad=!(loading||charEnded) ? this.onBtnLoad(offset): null;
 
         return (
             <div className="char__list">
                 {errorMessage}
-                {spinner}
                 {content}
-                <button className="button button__main button__long">
-                    <div className="inner">load more</div>
-                </button>
+                {spinner}
+                {btnLoad}
             </div>
         )
     }

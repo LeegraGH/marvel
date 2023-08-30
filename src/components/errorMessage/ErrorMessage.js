@@ -1,4 +1,4 @@
-import error from './error.gif';
+import error from './error.svg';
 
 import './errorMessage.scss';
 
