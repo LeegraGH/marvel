@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import MarvelService from '../../services/MarvelService';
@@ -49,12 +49,39 @@ class CharList extends Component {
         .catch(this.onError);
     }
 
+    charRefs=[];
+
+    setRef=(ref)=>{
+        this.charRefs.push(ref);
+    }
+
+    focusChar=(id)=>{
+        this.charRefs.forEach(char=>char.classList.remove('char__item_selected'));
+        this.charRefs[id].classList.add('char__item_selected');
+        // this.charRefs[id].focus();
+    }
+
     onCharsList = (chars) => {
-        const charsList=chars.map(char => {
+        const charsList=chars.map((char, i) => {
             const {id, thumbnail, name}=char;
             const imgStyle = setObjFitImg(thumbnail);
             return (
-                <li className="char__item" key={id} onClick={()=>this.props.onCharSelect(id)}>
+                <li 
+                className="char__item" 
+                key={id}
+                ref={this.setRef}
+                onClick={()=>{
+                    this.props.onCharSelect(id);
+                    this.focusChar(i); 
+                }}
+                onKeyUp={(e)=>{
+                    if (e.key==="Enter")
+                    {
+                        this.props.onCharSelect(id);
+                        this.focusChar(i);
+                    } 
+                }}
+                tabIndex={1}>
                     <img src={thumbnail} alt={name} style={imgStyle}/>
                     <div className="char__name">{name}</div>
                 </li>
