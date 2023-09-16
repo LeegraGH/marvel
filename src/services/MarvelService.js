@@ -1,28 +1,24 @@
-class MarvelService {
+import { useHttp } from "../hooks/http.hook";
 
-    _apiBase = "https://gateway.marvel.com:443/v1/public/";
-    _apiKey="apikey=151bb1b673fe6d640a269f7e649a88b4";
-    _offsetBase=0;
+const useMarvelService = () => {
 
-    getResource = async (url) => {
-        let res = await fetch(url);
-    
-        if (!res.ok) throw new Error(`Could not fetch ${url}, status: ${res.status}`);
-    
-        return await res.json();
+    const {loading, request, error, clearError} = useHttp();
+
+    const _apiBase = "https://gateway.marvel.com:443/v1/public/";
+    const _apiKey="apikey=151bb1b673fe6d640a269f7e649a88b4";
+    const _offsetBase=0;
+
+    const getAllCharacters = async (offset=_offsetBase) => {
+        const res = await request(`${_apiBase}characters?limit=9&offset=${offset}&${_apiKey}`);
+        return {total: res.data.total, newChars: res.data.results.map(_transformCharacter)};
     }
 
-    getAllCharacters = async (offset=this._offsetBase) => {
-        const res = await this.getResource(`${this._apiBase}characters?limit=9&offset=${offset}&${this._apiKey}`);
-        return {total: res.data.total, newChars: res.data.results.map(this._transformCharacter)};
+    const getCharacter = async (id) => {
+        const res = await request(`${_apiBase}characters/${id}?${_apiKey}`);
+        return _transformCharacter(res.data.results[0]);
     }
 
-    getCharacter = async (id) => {
-        const res = await this.getResource(`${this._apiBase}characters/${id}?${this._apiKey}`);
-        return this._transformCharacter(res.data.results[0]);
-    }
-
-    _transformCharacter = (char) => {
+    const _transformCharacter = (char) => {
         let description=char.description?(char.description.length>180?char.description.slice(0,180)+"…":char.description):"The information about this character is not available.";
 
         return {
@@ -35,9 +31,11 @@ class MarvelService {
             comics: char.comics.items
         };
     }
+
+    return {loading, error, getAllCharacters, getCharacter, clearError};
 }
 
-const setObjFitImg = (thumbnail) => {
+export const setObjFitImg = (thumbnail) => {
     let styleImg={"objectFit": "cover"};
     if (thumbnail==="http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg"){
         styleImg={"objectFit": "initial"};
@@ -45,5 +43,5 @@ const setObjFitImg = (thumbnail) => {
     return styleImg;
 }
 
-export default MarvelService;
-export {setObjFitImg};
+
+export default useMarvelService;

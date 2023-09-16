@@ -1,22 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 
-import MarvelService from '../../services/MarvelService';
+import useMarvelService from '../../services/MarvelService';
+import { setObjFitImg } from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
-import { setObjFitImg } from '../../services/MarvelService';
 
 import './charList.scss';
 
 const CharList = (props) => {
 
     const [chars, setChars]=useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError]=useState(false);
     const [offset, setOffset]=useState(0);
     const [charEnded, setEnded]=useState(false);
 
-    const marvelService = new MarvelService();
+    const {loading, error, getAllCharacters} = useMarvelService();
 
     useEffect(()=>{
         updateChars();
@@ -28,22 +26,13 @@ const CharList = (props) => {
         const newOffset=offset+9;
         if (newOffset>=total) end=true;
         setChars(chars=>[...chars, ...newChars]);
-        setLoading(false);
         setOffset(newOffset);
         setEnded(end);
     }
 
-    const onError = () => {
-        setLoading(false);
-        setError(true);
-    }
-
     const updateChars=()=>{
-        setLoading(true);
-        setError(false);
-        marvelService.getAllCharacters(offset)
-        .then(onCharsLoaded)
-        .catch(onError);
+        getAllCharacters(offset)
+        .then(onCharsLoaded);
     }
 
     const charRefs=useRef([]);
