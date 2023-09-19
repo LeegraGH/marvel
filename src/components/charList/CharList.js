@@ -19,15 +19,13 @@ const CharList = (props) => {
     useEffect(()=>{
         updateChars();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [])
 
     const onCharsLoaded=({total, newChars})=>{
-        let end=false;
         const newOffset=offset+9;
-        if (newOffset>=total) end=true;
+        if (newOffset>=total) setEnded(true);
         setChars(chars=>[...chars, ...newChars]);
         setOffset(newOffset);
-        setEnded(end);
     }
 
     const updateChars=()=>{

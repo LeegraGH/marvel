@@ -18,6 +18,32 @@ const useMarvelService = () => {
         return _transformCharacter(res.data.results[0]);
     }
 
+    const getComic = async (id) => {
+        const res =  await request(`${_apiBase}comics/${id}?${_apiKey}`);
+        return _transformComic(res.data.results[0]);
+    }
+
+    const getAllComics = async (offset=_offsetBase) => {
+        const res =  await request(`${_apiBase}comics?limit=8&offset=${offset}&${_apiKey}`);
+        return {total: res.data.total, newComics: res.data.results.map(_transformComic)};
+    }
+
+    const _transformComic = (comic) => {
+        const price=comic.prices[0].price===0?"Price is not available":`${comic.prices[0].price}$`;
+
+        return {
+            id: comic.id,
+            title: comic.title,
+            description: comic.description || "There is no description",
+            pageCount: comic.pageCount
+				? `${comic.pageCount} pages`
+				: "No information about the number of pages",
+            language: comic.textObjects[0]?.language || "en-us",
+            price: price,
+            thumbnail: comic.thumbnail.path+'.'+comic.thumbnail.extension
+        }
+    }
+
     const _transformCharacter = (char) => {
         let description=char.description?(char.description.length>180?char.description.slice(0,180)+"…":char.description):"The information about this character is not available.";
 
@@ -32,7 +58,7 @@ const useMarvelService = () => {
         };
     }
 
-    return {loading, error, getAllCharacters, getCharacter, clearError};
+    return {loading, error, getAllCharacters, getCharacter, clearError, getAllComics, getComic};
 }
 
 export const setObjFitImg = (thumbnail) => {
