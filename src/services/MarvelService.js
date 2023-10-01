@@ -10,12 +10,18 @@ const useMarvelService = () => {
 
     const getAllCharacters = async (offset=_offsetBase) => {
         const res = await request(`${_apiBase}characters?limit=9&offset=${offset}&${_apiKey}`);
-        return {total: res.data.total, newChars: res.data.results.map(_transformCharacter)};
+        return {total: res.data.total, newChars: res.data.results.map(char => _transformCharacter(char, false))};
     }
 
-    const getCharacter = async (id) => {
+    const getCharacter = async (id, isFullDescr) => {
         const res = await request(`${_apiBase}characters/${id}?${_apiKey}`);
-        return _transformCharacter(res.data.results[0]);
+        return _transformCharacter(res.data.results[0], isFullDescr);
+    }
+
+    const getCharacterByName = async (name) => {
+        const res = await request(`${_apiBase}characters?${_apiKey}&name=${name}&limit=1`);
+        if (res.data.results[0]) return _transformCharacter(res.data.results[0], false);
+        else return null;
     }
 
     const getComic = async (id) => {
@@ -44,8 +50,10 @@ const useMarvelService = () => {
         }
     }
 
-    const _transformCharacter = (char) => {
-        let description=char.description?(char.description.length>180?char.description.slice(0,180)+"…":char.description):"The information about this character is not available.";
+    const _transformCharacter = (char, isFullDescr) => {
+        let description=char.description?
+        ((char.description.length>180&&!isFullDescr)?char.description.slice(0,180)+"…":char.description)
+        :"The information about this character is not available.";
 
         return {
             id: char.id,
@@ -58,7 +66,7 @@ const useMarvelService = () => {
         };
     }
 
-    return {loading, error, getAllCharacters, getCharacter, clearError, getAllComics, getComic};
+    return {loading, error, getAllCharacters, getCharacter, clearError, getAllComics, getComic, getCharacterByName};
 }
 
 export const setObjFitImg = (thumbnail) => {

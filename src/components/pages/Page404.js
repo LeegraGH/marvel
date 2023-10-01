@@ -6,7 +6,7 @@ const Page404 = () => {
         <div>
             <ErrorMessage/>
             <p style={{"textAlign": "center", "fontWeight": "bold", "fontSize": "24px"}}>Page does not exist</p>
-            <Link style={{"display":"block","textAlign": "center", "fontWeight": "bold", "fontSize": "24px", "margin-top":"30px", "color":"#9F0013"}} to="/">Back to main page</Link>
+            <Link style={{"display":"block","textAlign": "center", "fontWeight": "bold", "fontSize": "24px", "marginTop":"30px", "color":"#9F0013"}} to="/">Back to main page</Link>
         </div>
     )
 }
