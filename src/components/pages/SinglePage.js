@@ -11,7 +11,7 @@ import '../../style/single.scss';
 
 const SinglePage = ({Component, dataType}) => {
     const {id}=useParams();
-    const [data, setData]=useState({});
+    const [data, setData]=useState(null);
 
     const {loading, error, clearError, getComic, getCharacter}=useMarvelService();
 
@@ -40,7 +40,7 @@ const SinglePage = ({Component, dataType}) => {
         setData(data);
     }
 
-    const content = !(loading||error)?<Component data={data}/>:null;
+    const content = !(loading||error||!data)?<Component data={data}/>:null;
     const spinner = loading?<Spinner/>:null;
     const errorMessage=error?<ErrorMessage/>:null;
 
