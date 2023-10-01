@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 import { setObjFitImg } from '../../services/MarvelService';
 
@@ -7,6 +8,13 @@ import '../../style/single.scss';
 const SingleComic = ({data}) => {
     return (
         <>
+        <Helmet>
+            <meta
+                name="description"
+                content={`Marvel Comic - ${data.title}`}
+                />
+            <title>{data.title}</title>
+        </Helmet>
         <div className="single">
             <img src={data.thumbnail} alt={data.title} style={setObjFitImg(data.thumbnail)} className="single__img"/>
             <div className="single__info">
