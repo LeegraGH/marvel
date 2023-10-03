@@ -32,6 +32,7 @@ const RandomChar = () => {
     // const errorMessage= error ? <ErrorMessage/>:null;
     // const spinner = loading ? <Spinner/> : null;
     // const content = !(error || loading) ? <View char={char}/>:null;
+    console.log("random");
 
     return (
         <div className="randomchar">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import useMarvelService from '../../services/MarvelService';
@@ -117,9 +117,14 @@ const CharList = (props) => {
     // const content=!(error||charList.length===0)?(charList):null;
     // const btnLoad=!(loading||charEnded) ? onBtnLoad(offset): null;
 
+    const elements = useMemo(()=>{
+        return setContent(process, ()=>onCharsList(chars), ()=>onBtnLoad(offset), chars);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [process]);
+
     return (
         <div className="char__list">
-            {setContent(process, ()=>onCharsList(chars), ()=>onBtnLoad(offset), chars)}
+            {elements}
         </div>
     )
 }
