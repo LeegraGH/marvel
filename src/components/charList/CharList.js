@@ -5,8 +5,32 @@ import useMarvelService from '../../services/MarvelService';
 import { setObjFitImg } from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
+// import setContent from '../../utils/setContent';
 
 import './charList.scss';
+
+const setContent = (process, Component, Button, data) => {
+    switch (process){
+        case "waiting":
+            return <Spinner/>;
+        case "loading":
+            return data.length!==0 ? 
+            (<>
+            <Component/>
+            <Spinner/>
+            </>)
+            :<Spinner/>;
+        case "confirmed":
+            return (<>
+                    <Component/>
+                    <Button/>
+                    </>);
+        case "error":
+            return <ErrorMessage/>;
+        default:
+            throw new Error("Unexpected process state");
+    }
+}
 
 const CharList = (props) => {
 
@@ -14,7 +38,7 @@ const CharList = (props) => {
     const [offset, setOffset]=useState(0);
     const [charEnded, setEnded]=useState(false);
 
-    const {loading, error, getAllCharacters} = useMarvelService();
+    const {getAllCharacters, process, setProcess} = useMarvelService();
 
     useEffect(()=>{
         updateChars();
@@ -30,7 +54,8 @@ const CharList = (props) => {
 
     const updateChars=()=>{
         getAllCharacters(offset)
-        .then(onCharsLoaded);
+        .then(onCharsLoaded)
+        .then(()=>setProcess("confirmed"));
     }
 
     const charRefs=useRef([]);
@@ -69,33 +94,32 @@ const CharList = (props) => {
         })
     
         return (
-            <ul className="char__grid">
-                {charsList}
-            </ul>
+            <>
+                <ul className="char__grid">
+                    {charsList}
+                </ul>
+            </>
         )
     }
 
     const onBtnLoad = (offset) => {
         return (
-            <button className="button button__main button__long" onClick={()=>updateChars(offset)}>
+            <button style={charEnded?{display:"none"}:{display:"block"}} className="button button__main button__long" onClick={()=>updateChars(offset)}>
                 <div className="inner">load more</div>
             </button>
         )
     }
 
-    const charList=onCharsList(chars);
+    // const charList=onCharsList(chars);
 
-    const errorMessage= error ? <ErrorMessage/>:null;
-    const spinner = loading ? <Spinner/> : null;
-    const content=!(error||charList.length===0)?(charList):null;
-    const btnLoad=!(loading||charEnded) ? onBtnLoad(offset): null;
+    // const errorMessage= error ? <ErrorMessage/>:null;
+    // const spinner = loading ? <Spinner/> : null;
+    // const content=!(error||charList.length===0)?(charList):null;
+    // const btnLoad=!(loading||charEnded) ? onBtnLoad(offset): null;
 
     return (
         <div className="char__list">
-            {errorMessage}
-            {content}
-            {spinner}
-            {btnLoad}
+            {setContent(process, ()=>onCharsList(chars), ()=>onBtnLoad(offset), chars)}
         </div>
     )
 }
